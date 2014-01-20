@@ -86,6 +86,7 @@ public class CoreHandler implements IScopeHandler, CoreHandlerMXBean {
 			// Get client registry for connection scope
 			IClientRegistry clientRegistry = connectionScope.getContext().getClientRegistry();
 			log.debug("Client registry: {}", (clientRegistry == null ? "is null" : "not null"));
+
 			if (clientRegistry != null) {
 				IClient client = conn.getClient();
 				if (client == null) {
@@ -123,6 +124,7 @@ public class CoreHandler implements IScopeHandler, CoreHandlerMXBean {
 				}
 				// assign connection to client
 				conn.initialize(client);
+
 				// we could checked for banned clients here
 				connect = true;
 			} else {

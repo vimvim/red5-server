@@ -36,6 +36,27 @@
 	
 	<bean id="red5.scopeResolver" class="org.red5.server.scope.ScopeResolver">
 		<property name="globalScope" ref="global.scope" />
-	</bean>	
-	
+	</bean>
+
+    <bean id="web.handler" class="org.test.Application"/>
+
+    <bean id="web.context" class="org.red5.server.Context" autowire="byType">
+        <property name="scopeResolver" ref="red5.scopeResolver" />
+        <property name="clientRegistry" ref="global.clientRegistry" />
+    </bean>
+
+    <bean id="web.scope" class="org.red5.server.scope.WebScope" init-method="register">
+        <property name="server" ref="red5.server" />
+        <property name="name" value="live" />
+        <property name="parent" ref="global.scope" />
+        <property name="context" ref="web.context" />
+        <property name="handler" ref="web.handler" />
+        <property name="contextPath" value="/live" />
+        <property name="virtualHosts" value="localhost, 127.0.0.1" />
+        <!--<property name="persistenceClass">
+            <value>org.red5.server.persistence.FilePersistence</value>
+        </property>
+        -->
+    </bean>
+
 </beans>

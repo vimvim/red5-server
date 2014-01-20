@@ -36,5 +36,19 @@
 	
 	<!-- Now we can load the JEE container / servlet engine -->
   	<import resource="no-jee-container.xml"/>
-	
+
+    <!--
+    <bean id="web.handler" class="org.test.Application"  />
+
+    <bean id="web.context" class="org.red5.server.Context" />
+
+    <bean id="web.scope" class="org.red5.server.scope.Scope">
+        <property name="name" value="live" />
+        <property name="parent" ref="global.scope" />
+        <property name="context" ref="web.context" />
+        <property name="handler" ref="web.handler" />
+    </bean>
+    -->
+
 </beans>
+

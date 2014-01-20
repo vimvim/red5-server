@@ -104,9 +104,9 @@ public class ScopeResolver implements IScopeResolver {
 					}
 				}
 				// if the scope is still equal to root then the room was not found
-				if (scope == root) {
-					throw new ScopeNotFoundException(scope, child);
-				}
+				// if (scope == root) {
+				//	throw new ScopeNotFoundException(scope, child);
+				// }
 				// some scopes don't implement IScope, such as SharedObjectScope
 				if (scope instanceof IScope) {
 					if (scope.getType().equals(ScopeType.APPLICATION) && ((WebScope) scope).isShuttingDown()) {

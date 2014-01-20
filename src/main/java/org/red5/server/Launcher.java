@@ -20,9 +20,13 @@ package org.red5.server;
 
 import org.red5.logging.Red5LoggerFactory;
 import org.red5.server.api.Red5;
+import org.red5.server.scope.GlobalScope;
+import org.red5.server.scope.Scope;
 import org.slf4j.Logger;
 import org.slf4j.bridge.SLF4JBridgeHandler;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
+import org.test.Application;
 
 /**
  * Launches Red5.
@@ -74,6 +78,28 @@ public class Launcher {
 				}
 			}
 			*/
+
+            /*
+            ApplicationContext appContext = (ApplicationContext) ctx.getBean("red5.common");
+            Server server = appContext.getBean(Server.class);
+            server.addMapping("","live", "live");
+            */
+
+            // Here we will construct our App beans:
+            /* GlobalScope globalScope = (GlobalScope) ctx.getBean("global.scope");
+
+            Application app = ctx.getBean(Application.class);
+            Context context = ctx.getBean(Context.class);
+
+            Scope scope = ctx.getBean(Scope.class);
+            scope.setName("live");
+            scope.setParent(globalScope);
+            scope.setContext(context);
+            scope.setHandler(app);
+            */
+
+
+
 		} catch (Throwable t) {
 			System.out.printf("Exception %s\n", t);
 			System.exit(9999);
