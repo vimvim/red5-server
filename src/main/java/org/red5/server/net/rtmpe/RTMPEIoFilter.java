@@ -47,10 +47,12 @@ public class RTMPEIoFilter extends IoFilterAdapter {
 
 	@Override
 	public void messageReceived(NextFilter nextFilter, IoSession session, Object obj) throws Exception {
+
 		String sessionId = (String) session.getAttribute(RTMPConnection.RTMP_SESSION_ID);
-		log.trace("Session id: {}", sessionId);
+		log.trace("New incoming message for session id: {}", sessionId);
 
         if (obj instanceof IoBuffer) {
+            log.trace("Message size: {}", ((IoBuffer) obj).limit());
             DebugDumper.dumpIncoming(sessionId, (IoBuffer) obj);
         }
 
@@ -145,8 +147,12 @@ public class RTMPEIoFilter extends IoFilterAdapter {
         String sessionId = (String) session.getAttribute(RTMPConnection.RTMP_SESSION_ID);
         DebugDumper.dumpOutgoing(sessionId, (IoBuffer) request.getMessage());
 
+        log.trace("Outgoing message for session id: {} size:", sessionId, ((IoBuffer) request.getMessage()).limit());
+
 		Cipher cipher = (Cipher) session.getAttribute(RTMPConnection.RTMPE_CIPHER_OUT);
 		if (cipher != null) { //may want to verify handshake is complete as well
+            log.trace("Encrypt outgoing message");
+
 			IoBuffer message = (IoBuffer) request.getMessage();
 			if (!message.hasRemaining()) {
 				// Ignore empty buffers
@@ -164,7 +170,7 @@ public class RTMPEIoFilter extends IoFilterAdapter {
 				nextFilter.filterWrite(session, new EncryptedWriteRequest(request, messageEncrypted));
 			}
 		} else {
-			log.trace("Not encrypting write request");
+			// log.trace("Not encrypting write request");
 			nextFilter.filterWrite(session, request);
 		}
 	}

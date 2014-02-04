@@ -318,7 +318,7 @@ public abstract class BaseConnection extends AttributeStore implements IConnecti
 	 * @return       true if connection is bound to scope, false otherwise
 	 */
 	public boolean isConnected() {
-		log.debug("Connected: {}", (scope != null));
+		log.trace("Connected: {}", (scope != null));
 		return scope != null;
 	}
 

@@ -47,6 +47,9 @@ public class Launcher {
 	 * Launch Red5 under it's own classloader
 	 */
 	public void launch() {
+
+        System.setProperty("logback.configurationFile", "conf/logback.xml");
+
 		System.out.printf("Root: %s\nDeploy type: %s\nLogback selector: %s\n", System.getProperty("red5.root"), System.getProperty("red5.deployment.type"),
 				System.getProperty("logback.ContextSelector"));
 		try {

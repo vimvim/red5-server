@@ -72,7 +72,7 @@ public abstract class BaseRTMPHandler implements IRTMPHandler, Constants, Status
 				final int streamId = header.getStreamId();
 				final Channel channel = conn.getChannel(header.getChannelId());
 				final IClientStream stream = conn.getStreamById(streamId);
-				log.trace("Message received - stream id: {} channel: {} header: {}", streamId, channel.getId(), header);
+				log.trace("RTMP Message received - stream id: {} channel: {} header: {}", streamId, channel.getId(), header);
 				// set stream id on the connection
 				conn.setStreamId(streamId);
 				// increase number of received messages
@@ -121,6 +121,9 @@ public abstract class BaseRTMPHandler implements IRTMPHandler, Constants, Status
 						//mark the event as from a live source
 						//log.trace("Marking message as originating from a Live source");
 						message.setSourceType(Constants.SOURCE_TYPE_LIVE);
+
+                        log.trace("Audio/Video data received - stream id: {} channel: {}", streamId, channel.getId());
+
 						// NOTE: If we respond to "publish" with "NetStream.Publish.BadName",
 						// the client sends a few stream packets before stopping. We need to ignore them.
 						if (stream != null) {
@@ -132,15 +135,15 @@ public abstract class BaseRTMPHandler implements IRTMPHandler, Constants, Status
 						onSharedObject(conn, channel, header, (SharedObjectMessage) message);
 						break;
 					case Constants.TYPE_CLIENT_BANDWIDTH: // onBWDone / peer bw
-						log.debug("Client bandwidth: {}", message);
+						log.debug("Client bandwidth msg: {}", message);
 						onClientBandwidth(conn, channel, (ClientBW) message);
 						break;
 					case Constants.TYPE_SERVER_BANDWIDTH: // window ack size
-						log.debug("Server bandwidth: {}", message);
+						log.debug("Server bandwidth msg: {}", message);
 						onServerBandwidth(conn, channel, (ServerBW) message);
 						break;
 					default:
-						log.debug("Unknown type: {}", header.getDataType());
+						log.debug("Unknown msg type: {}", header.getDataType());
 				}
 				if (message instanceof Unknown) {
 					log.info("Message type unknown: {}", message);

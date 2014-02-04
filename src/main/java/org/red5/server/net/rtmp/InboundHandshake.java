@@ -19,6 +19,8 @@
 package org.red5.server.net.rtmp;
 
 import java.security.KeyPair;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.Arrays;
 
 import javax.crypto.Cipher;
@@ -123,15 +125,21 @@ public class InboundHandshake extends RTMPHandshake {
             cipherOut.update(dummyBytes);
 		}						
 		input.mark();
+
 		//create the server digest
 		int serverDigestOffset = getDigestOffset(handshakeBytes);
+        log.trace("Server digest offset: {}", serverDigestOffset);
+
 		byte[] tempBuffer = new byte[Constants.HANDSHAKE_SIZE - DIGEST_LENGTH];
 	    System.arraycopy(handshakeBytes, 0, tempBuffer, 0, serverDigestOffset);
-	    System.arraycopy(handshakeBytes, serverDigestOffset + DIGEST_LENGTH, tempBuffer, serverDigestOffset, Constants.HANDSHAKE_SIZE - serverDigestOffset - DIGEST_LENGTH);			
+	    System.arraycopy(handshakeBytes, serverDigestOffset + DIGEST_LENGTH, tempBuffer, serverDigestOffset, Constants.HANDSHAKE_SIZE - serverDigestOffset - DIGEST_LENGTH);
+
 	    //calculate the hash
 		byte[] tempHash = calculateHMAC_SHA256(tempBuffer, GENUINE_FMS_KEY, 36);
+
 		//add the digest 
 		System.arraycopy(tempHash, 0, handshakeBytes, serverDigestOffset, DIGEST_LENGTH);
+
 		//compute the challenge digest
 		byte[] inputBuffer = new byte[Constants.HANDSHAKE_SIZE - DIGEST_LENGTH];
 		//log.debug("Before get: {}", input.position());
@@ -144,6 +152,8 @@ public class InboundHandshake extends RTMPHandshake {
 		input.reset();
 		//compute key
 		tempHash = calculateHMAC_SHA256(challengeKey, GENUINE_FMS_KEY, 68);
+        log.trace("Key: {}", Hex.encodeHexString(tempHash));
+
 		//generate hash
 		byte[] randBytes = new byte[Constants.HANDSHAKE_SIZE - DIGEST_LENGTH];
 		random.nextBytes(randBytes);
@@ -243,8 +253,31 @@ public class InboundHandshake extends RTMPHandshake {
 		log.trace("Outgoing DH offset: {}", serverDHOffset);
 		//create keypair
 		KeyPair keys = generateKeyPair();
+
+        DebugDumper.dumpKeyPair(keys);
+
+        if (log.isTraceEnabled()) {
+
+            PublicKey pub = keys.getPublic();
+            System.out.println("Keypair: Public Key: " + Hex.encodeHexString(pub.getEncoded()));
+
+            PrivateKey priv = keys.getPrivate();
+            System.out.println("Keypair: Private Key: " + Hex.encodeHexString(priv.getEncoded()));
+        }
+
 		//get public key
 		incomingPublicKey = getPublicKey(keys);
+        if (log.isTraceEnabled()) {
+
+            int len = incomingPublicKey.length;
+
+            log.trace("Generated public key: {},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{} ...{},{},{}", new Object[] {
+                    incomingPublicKey[0], incomingPublicKey[1], incomingPublicKey[2], incomingPublicKey[3], incomingPublicKey[4],
+                    incomingPublicKey[5], incomingPublicKey[6], incomingPublicKey[7], incomingPublicKey[8], incomingPublicKey[9],
+                    incomingPublicKey[10], incomingPublicKey[11], incomingPublicKey[12], incomingPublicKey[13], incomingPublicKey[14],
+                    incomingPublicKey[15], incomingPublicKey[len-3], incomingPublicKey[len-2], incomingPublicKey[len-1]});
+        }
+
 		//add to handshake bytes
 		System.arraycopy(incomingPublicKey, 0, handshakeBytes, serverDHOffset, KEY_LENGTH);
 	}	
@@ -293,7 +326,7 @@ public class InboundHandshake extends RTMPHandshake {
 	    System.arraycopy(pBuffer, digestOffset + DIGEST_LENGTH, tempBuffer, digestOffset, Constants.HANDSHAKE_SIZE - digestOffset - DIGEST_LENGTH);	    
 
 	    byte[] tempHash = calculateHMAC_SHA256(tempBuffer, GENUINE_FP_KEY, 30);
-	    log.debug("Temp: {}", Hex.encodeHexString(tempHash));
+	    // log.debug("Temp: {}", Hex.encodeHexString(tempHash));
 
 	    boolean result = true;
 	    for (int i = 0; i < DIGEST_LENGTH; i++) {

@@ -523,9 +523,11 @@ public class RTMPProtocolDecoder implements Constants, IEventDecoder {
 		byte dataType = header.getDataType();
 		switch (dataType) {
 			case TYPE_INVOKE:
+                if (log.isTraceEnabled()) log.trace("Packet type: Invoke");
 				message = decodeInvoke(conn.getEncoding(), in);
 				break;
 			case TYPE_NOTIFY:
+                if (log.isTraceEnabled()) log.trace("Packet type: Notify");
 				if (header.getStreamId() == 0) {
 					message = decodeNotify(conn.getEncoding(), in, header);
 				} else {
@@ -533,44 +535,57 @@ public class RTMPProtocolDecoder implements Constants, IEventDecoder {
 				}
 				break;
 			case TYPE_AUDIO_DATA:
+                if (log.isTraceEnabled()) log.trace("Packet type: Audio data");
 				message = decodeAudioData(in);
 				message.setSourceType(Constants.SOURCE_TYPE_LIVE);
 				break;
 			case TYPE_VIDEO_DATA:
+                if (log.isTraceEnabled()) log.trace("Packet type: Video data");
 				message = decodeVideoData(in);
 				message.setSourceType(Constants.SOURCE_TYPE_LIVE);
 				break;
 			case TYPE_AGGREGATE:
+                if (log.isTraceEnabled()) log.trace("Packet type: Aggregate");
 				message = decodeAggregate(in);
 				break;
 			case TYPE_FLEX_SHARED_OBJECT: // represents an SO in an AMF3 container
+                if (log.isTraceEnabled()) log.trace("Packet type: Flex shared object");
 				message = decodeFlexSharedObject(in);
 				break;
 			case TYPE_SHARED_OBJECT:
+                if (log.isTraceEnabled()) log.trace("Packet type: Shared object");
 				message = decodeSharedObject(in);
 				break;
 			case TYPE_FLEX_MESSAGE:
+                if (log.isTraceEnabled()) log.trace("Packet type: Flex message");
 				message = decodeFlexMessage(in);
 				break;
 			case TYPE_FLEX_STREAM_SEND:
+                if (log.isTraceEnabled()) log.trace("Packet type: Flex stream send");
 				message = decodeFlexStreamSend(in);
 				break;
 			case TYPE_PING:
+                if (log.isTraceEnabled()) log.trace("Packet type: Ping");
 				message = decodePing(in);
 				break;
 			case TYPE_BYTES_READ:
+                if (log.isTraceEnabled()) log.trace("Packet type: Bytes read");
 				message = decodeBytesRead(in);
 				break;
 			case TYPE_CHUNK_SIZE:
+                if (log.isTraceEnabled()) log.trace("Packet type: Chunk size");
 				message = decodeChunkSize(in);
 				break;
 			case TYPE_SERVER_BANDWIDTH:
+                if (log.isTraceEnabled()) log.trace("Packet type: Server bandwidth");
 				message = decodeServerBW(in);
 				break;
 			case TYPE_CLIENT_BANDWIDTH:
+                if (log.isTraceEnabled()) log.trace("Packet type: Client bandwidth");
 				message = decodeClientBW(in);
 				break;
 			case TYPE_ABORT:
+                if (log.isTraceEnabled()) log.trace("Packet type: Abort");
 				message = decodeAbort(in);
 				break;
 			default:

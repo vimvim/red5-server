@@ -17,7 +17,7 @@
   </appender>
    
   <root>
-    <level value="INFO"/>
+    <level value="TRACE"/>
     <appender-ref ref="CONSOLE"/>
     <appender-ref ref="FILE"/>
   </root>
@@ -39,11 +39,93 @@
   </logger>
   
   <logger name="org.red5.server.net.rtmpt.RTMPTConnection">
-    <level value="DEBUG"/>
+    <level value="TRACE"/>
   </logger>
-  
+
+  <logger name="org.red5.io.object.Serializer">
+      <level value="INFO"/>
+  </logger>
+
+  <logger name="net.sf.ehcache">
+      <level value="INFO"/>
+  </logger>
+
+  <logger name="org.quartz">
+      <level value="INFO"/>
+  </logger>
+
+  <logger name="org.red5.server.net.rtmp.status.StatusObjectService">
+      <level value="INFO"/>
+  </logger>
+
+  <logger name="org.red5.io.utils.ConversionUtils">
+      <level value="INFO"/>
+  </logger>
+
+  <logger name="org.red5.server.net.rtmp.RTMPConnManager">
+      <level value="INFO"/>
+  </logger>
+
+  <logger name="org.red5.io.utils.BufferUtils">
+      <level value="INFO"/>
+  </logger>
+
+  <logger name="org.red5.io.amf.Input">
+      <level value="INFO"/>
+  </logger>
+
+  <logger name="org.red5.server.api.Red5">
+      <level value="INFO"/>
+  </logger>
+
+  <logger name="org.red5.server.service.ReflectionUtils">
+      <level value="INFO"/>
+  </logger>
+
+  <logger name="org.red5.server.BaseConnection">
+      <level value="INFO"/>
+  </logger>
+
+  <logger name="org.red5.server.net.rtmp.RTMPMinaIoHandler">
+      <level value="INFO"/>
+  </logger>
+
+  <logger name="org.red5.server.net.rtmp.codec.RTMPMinaProtocolEncoder">
+      <level value="INFO"/>
+  </logger>
+
+  <logger name="org.red5.server.scope">
+      <level value="INFO"/>
+  </logger>
+
+  <logger name="org.red5.server.net.rtmp.RTMPConnection">
+      <level value="DEBUG"/>
+  </logger>
+
+  <logger name="org.red5.server.net.rtmp.RTMPMinaConnection">
+      <level value="INFO"/>
+  </logger>
+
+  <logger name="org.red5.server.net.rtmp.codec.RTMPMinaProtocolDecoder">
+      <level value="INFO"/>
+  </logger>
+
   <logger name="org.red5.server.stream.RecordingListener">
-    <level value="DEBUG"/>
+    <level value="TRACE"/>
   </logger>
-   
+
+  <logger name="org.red5.server.net.rtmp.InboundHandshake">
+     <level value="TRACE"/>
+  </logger>
+
+  <logger name="org.red5.server.net.rtmp.codec.RTMPProtocolEncoder">
+      <level value="DEBUG"/>
+  </logger>
+
+  <logger name="org.red5.server.net.rtmp.codec.RTMPProtocolDecoder">
+      <level value="TRACE"/>
+  </logger>
+
+
+
 </configuration>
