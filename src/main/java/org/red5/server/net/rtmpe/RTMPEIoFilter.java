@@ -25,6 +25,7 @@ import org.apache.mina.core.filterchain.IoFilterAdapter;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.WriteRequest;
 import org.apache.mina.core.write.WriteRequestWrapper;
+import org.red5.debug.DebugDumper;
 import org.red5.server.net.rtmp.RTMPConnManager;
 import org.red5.server.net.rtmp.RTMPConnection;
 import org.red5.server.net.rtmp.RTMPHandshake;
@@ -50,7 +51,7 @@ public class RTMPEIoFilter extends IoFilterAdapter {
 		log.trace("Session id: {}", sessionId);
 
         if (obj instanceof IoBuffer) {
-            DebugDumper.logIncoming(sessionId, obj);
+            DebugDumper.dumpIncoming(sessionId, (IoBuffer) obj);
         }
 
 		RTMPMinaConnection conn = (RTMPMinaConnection) RTMPConnManager.getInstance().getConnectionBySessionId(sessionId);		
@@ -140,6 +141,10 @@ public class RTMPEIoFilter extends IoFilterAdapter {
 
 	@Override
 	public void filterWrite(NextFilter nextFilter, IoSession session, WriteRequest request) throws Exception {
+
+        String sessionId = (String) session.getAttribute(RTMPConnection.RTMP_SESSION_ID);
+        DebugDumper.dumpOutgoing(sessionId, (IoBuffer) request.getMessage());
+
 		Cipher cipher = (Cipher) session.getAttribute(RTMPConnection.RTMPE_CIPHER_OUT);
 		if (cipher != null) { //may want to verify handshake is complete as well
 			IoBuffer message = (IoBuffer) request.getMessage();

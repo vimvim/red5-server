@@ -26,6 +26,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.mina.core.buffer.IoBuffer;
+import org.red5.debug.DebugDumper;
 import org.red5.server.api.Red5;
 import org.red5.server.net.rtmp.message.Constants;
 
@@ -146,6 +147,9 @@ public class InboundHandshake extends RTMPHandshake {
 		//generate hash
 		byte[] randBytes = new byte[Constants.HANDSHAKE_SIZE - DIGEST_LENGTH];
 		random.nextBytes(randBytes);
+
+        DebugDumper.dumpHandshakeRand2(randBytes);
+
 		byte[] lastHash = calculateHMAC_SHA256(randBytes, tempHash, DIGEST_LENGTH);
 		//set handshake with encryption type 
 		output.put(handshakeType);			
@@ -212,7 +216,10 @@ public class InboundHandshake extends RTMPHandshake {
 		byte[] rndBytes = new byte[Constants.HANDSHAKE_SIZE - 8];
 		random.nextBytes(rndBytes);		
 		//copy random bytes into our handshake array
-		System.arraycopy(rndBytes, 0, handshakeBytes, 8, (Constants.HANDSHAKE_SIZE - 8));	
+		System.arraycopy(rndBytes, 0, handshakeBytes, 8, (Constants.HANDSHAKE_SIZE - 8));
+
+        DebugDumper.dumpHandshakeRand1(rndBytes);
+
 	}	
 	
 	/**
