@@ -92,36 +92,36 @@ public class RTMPProtocolDecoder implements Constants, IEventDecoder {
 		// decoded results
 		List<Object> result = null;
 		if (conn != null) {
-			log.trace("Decoding for connection - session id: {}", conn.getSessionId());
+// 			log.trace("{} decodeBuffer", conn.getSessionId());
 			try {
 				// instance list to hold results
 				result = new LinkedList<Object>();
 				// get the local decode state
 				RTMPDecodeState state = conn.getDecoderState();
-				log.trace("{}", state);
+// 				log.trace("{}", state);
 				if (!conn.getSessionId().equals(state.getSessionId())) {
 					log.warn("Session decode overlap: {} != {}", conn.getSessionId(), state.getSessionId());
 				}
 				while (buffer.hasRemaining()) {
 					final int remaining = buffer.remaining();
 					if (state.canStartDecoding(remaining)) {
-						log.trace("Can start decoding");
+//						log.trace("Can start decoding");
 						state.startDecoding();
 					} else {
-						log.trace("Cannot start decoding");
+//						log.trace("Cannot start decoding");
 						break;
 					}
 					final Object decodedObject = decode(conn, state, buffer);
 					if (state.hasDecodedObject()) {
-						log.trace("Has decoded object");
+//						log.trace("Has decoded object");
 						if (decodedObject != null) {
 							result.add(decodedObject);
 						}
 					} else if (state.canContinueDecoding()) {
-						log.trace("Can continue decoding");
+//						log.trace("Can continue decoding");
 						continue;
 					} else {
-						log.trace("Cannot continue decoding");
+//						log.trace("Cannot continue decoding");
 						break;
 					}
 				}
@@ -360,13 +360,24 @@ public class RTMPProtocolDecoder implements Constants, IEventDecoder {
 		}
 		BufferUtils.put(buf, in, readAmount);
 		if (buf.position() < header.getSize()) {
+
+            if (log.isDebugEnabled()) {
+                log.debug("Packet buffer not have enough data. Size:"+header.getSize()+" Have:"+buf.position());
+            }
+
 			state.continueDecoding();
 			return null;
 		}
 		if (buf.position() > header.getSize()) {
 			log.warn("Packet size expanded from {} to {} ({})", new Object[] { (header.getSize()), buf.position(), header });
 		}
+
 		buf.flip();
+
+        if (log.isDebugEnabled()) {
+            log.debug("Full packet received "+header);
+        }
+
 		try {
 			final IRTMPEvent message = decodeMessage(conn, packet.getHeader(), buf);
 			message.setHeader(packet.getHeader());
