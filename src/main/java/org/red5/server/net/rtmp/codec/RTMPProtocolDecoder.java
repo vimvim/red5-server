@@ -866,7 +866,7 @@ public class RTMPProtocolDecoder implements Constants, IEventDecoder {
 		// get the action
 		String action = Deserializer.deserialize(input, String.class);
 		if (log.isTraceEnabled()) {
-			log.trace("Action " + action);
+			log.trace("Action " + action+" Encoding "+encoding);
 		}
 		//throw a runtime exception if there is no action
 		if (action != null) {
@@ -880,6 +880,8 @@ public class RTMPProtocolDecoder implements Constants, IEventDecoder {
 			}
 			// get / set the parameters if there any
 			Object[] params = handleParameters(in, invoke, input);
+
+
 			// determine service information
 			final int dotIndex = action.lastIndexOf('.');
 			String serviceName = (dotIndex == -1) ? null : action.substring(0, dotIndex);
@@ -1154,6 +1156,10 @@ public class RTMPProtocolDecoder implements Constants, IEventDecoder {
 				@SuppressWarnings("unchecked")
 				final Map<String, Object> connParams = (Map<String, Object>) obj;
 				notify.setConnectionParams(connParams);
+
+                for(Map.Entry<String,?> entry: ((Map<String, Object>) obj).entrySet()) {
+                    log.debug(" {} = {}", entry.getKey(), entry.getValue());
+                }
 			} else if (obj != null) {
 				paramList.add(obj);
 			}
