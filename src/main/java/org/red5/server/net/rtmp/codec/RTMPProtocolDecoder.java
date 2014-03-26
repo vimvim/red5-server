@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.mina.core.buffer.IoBuffer;
+import org.red5.debug.DebugDumper;
 import org.red5.io.amf.AMF;
 import org.red5.io.amf.Output;
 import org.red5.io.amf3.AMF3;
@@ -851,6 +852,10 @@ public class RTMPProtocolDecoder implements Constants, IEventDecoder {
 
 	/** {@inheritDoc} */
 	public Invoke decodeInvoke(Encoding encoding, IoBuffer in) {
+
+        // THIS IS ONLY FOR DEBUG
+        IoBuffer incomingPacket = in.duplicate();
+
 		Invoke invoke = new Invoke();
 		int start = in.position();
 		Input input;
@@ -870,7 +875,12 @@ public class RTMPProtocolDecoder implements Constants, IEventDecoder {
 		}
 		//throw a runtime exception if there is no action
 		if (action != null) {
-			invoke.setTransactionId(Deserializer.<Number> deserialize(input, Number.class).intValue());
+
+            // THIS IS ONLY FOR DEBUG
+            int transactId = Deserializer.<Number> deserialize(input, Number.class).intValue();
+            DebugDumper.dumpInvokePacket(action, transactId, incomingPacket);
+
+			invoke.setTransactionId(transactId);
 			// now go back to the actual encoding to decode parameters
 			if (encoding == Encoding.AMF3) {
 				input = new org.red5.io.amf3.Input(in);

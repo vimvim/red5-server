@@ -124,6 +124,17 @@ public class DebugDumper {
         return new KeyPair(publicKey, privateKey);
     }
 
+    /**
+     * Dump binary invoke packet
+     *
+     * @param action            Invoke action name
+     * @param transactId        Transaction id
+     * @param in                Binary data
+     */
+    public static void dumpInvokePacket(String action, int transactId, IoBuffer in) {
+        dumpPacket("packet_invoke_"+action+"_"+transactId, in);
+    }
+
     private static void dumpPacket(String sessionId, Map<String,Integer> seqNums, String direction, IoBuffer data) {
 
         int seqNum = 0;
@@ -135,10 +146,15 @@ public class DebugDumper {
         seqNum++;
         seqNums.put(sessionId, seqNum);
 
+        dumpPacket(direction+"_"+seqNum, data);
+    }
+
+    private static void dumpPacket(String filename, IoBuffer data) {
+
         int arrayOffset = data.arrayOffset();
         int limit = data.limit();
 
-        dumpData(direction+"_"+seqNum, data.array(), arrayOffset, limit);
+        dumpData(filename, data.array(), arrayOffset, limit);
     }
 
     private static void dumpData(String filename, byte[] data, int offset, int limit) {
