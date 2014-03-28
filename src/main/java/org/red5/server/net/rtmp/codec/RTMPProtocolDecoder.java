@@ -554,6 +554,8 @@ public class RTMPProtocolDecoder implements Constants, IEventDecoder {
 			case TYPE_VIDEO_DATA:
                 if (log.isTraceEnabled()) log.trace("Packet type: Video data");
 				message = decodeVideoData(in);
+                if (log.isTraceEnabled()) log.trace("Video frame type: "+((VideoData) message).getFrameType());
+
 				message.setSourceType(Constants.SOURCE_TYPE_LIVE);
 				break;
 			case TYPE_AGGREGATE:
