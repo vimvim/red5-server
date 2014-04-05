@@ -21,12 +21,12 @@ public class DebugDumper {
     private static Map<String,Integer> inSeqNum = new HashMap<String,Integer>();
     private static Map<String,Integer> outSeqNum = new HashMap<String,Integer>();
 
-    public static synchronized void dumpIncoming(String sessionId, IoBuffer data) {
-        dumpPacket(sessionId, inSeqNum, "in", data);
+    public static synchronized int dumpIncoming(String sessionId, IoBuffer data) {
+        return dumpPacket(sessionId, inSeqNum, "in", data);
     }
 
-    public static synchronized void dumpOutgoing(String sessionId, IoBuffer data) {
-        dumpPacket(sessionId, outSeqNum, "out", data);
+    public static synchronized int dumpOutgoing(String sessionId, IoBuffer data) {
+        return dumpPacket(sessionId, outSeqNum, "out", data);
     }
 
     /**
@@ -135,7 +135,15 @@ public class DebugDumper {
         dumpPacket("packet_invoke_"+action+"_"+transactId, in);
     }
 
-    private static void dumpPacket(String sessionId, Map<String,Integer> seqNums, String direction, IoBuffer data) {
+    public static void dumpPacket(String filename, IoBuffer data) {
+
+        int arrayOffset = data.arrayOffset();
+        int limit = data.limit();
+
+        dumpData(filename, data.array(), arrayOffset, limit);
+    }
+
+    private static int dumpPacket(String sessionId, Map<String,Integer> seqNums, String direction, IoBuffer data) {
 
         int seqNum = 0;
 
@@ -147,14 +155,8 @@ public class DebugDumper {
         seqNums.put(sessionId, seqNum);
 
         dumpPacket(direction+"_"+seqNum, data);
-    }
 
-    private static void dumpPacket(String filename, IoBuffer data) {
-
-        int arrayOffset = data.arrayOffset();
-        int limit = data.limit();
-
-        dumpData(filename, data.array(), arrayOffset, limit);
+        return seqNum;
     }
 
     private static void dumpData(String filename, byte[] data, int offset, int limit) {

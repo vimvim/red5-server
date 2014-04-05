@@ -1161,6 +1161,7 @@ public abstract class RTMPConnection extends BaseConnection implements IStreamCa
 		if (lastPingSent.get() == 0) {
 			lastPongReceived.set(newPingTime);
 		}
+        log.debug("Send PING PING_CLIENT ");
 		Ping pingRequest = new Ping();
 		pingRequest.setEventType(Ping.PING_CLIENT);
 		lastPingSent.set(newPingTime);

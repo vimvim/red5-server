@@ -186,7 +186,7 @@ public class ConnectionConsumer implements IPushableConsumer, IPipeConnectionLis
 					}
 					break;
 				case Constants.TYPE_PING:
-					log.trace("Ping");
+					log.trace("SEND PING");
 					Ping ping = new Ping((Ping) msg);
 					ping.setHeader(header);
 					conn.ping(ping);

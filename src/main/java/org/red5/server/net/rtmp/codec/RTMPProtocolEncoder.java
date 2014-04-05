@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.mina.core.buffer.IoBuffer;
+import org.red5.debug.DebugDumper;
 import org.red5.io.object.Output;
 import org.red5.io.object.Serializer;
 import org.red5.io.utils.BufferUtils;
@@ -327,10 +328,12 @@ public class RTMPProtocolEncoder implements Constants, IEventEncoder {
 	 */
 	private byte getHeaderType(final Header header, final Header lastHeader) {
 		if (lastHeader == null) {
+            log.debug("Encode HEADER_NEW");
 			return HEADER_NEW;
 		}
 		final Integer lastFullTs = ((RTMPConnection) Red5.getConnectionLocal()).getState().getLastFullTimestampWritten(header.getChannelId());
 		if (lastFullTs == null) {
+            log.debug("Encode HEADER_NEW");
 			return HEADER_NEW;
 		}
 		final byte headerType;
@@ -338,15 +341,19 @@ public class RTMPProtocolEncoder implements Constants, IEventEncoder {
 		final long timeSinceFullTs = RTMPUtils.diffTimestamps(header.getTimer(), lastFullTs);
 		if (header.getStreamId() != lastHeader.getStreamId() || diff < 0 || timeSinceFullTs >= 250) {
 			// New header mark if header for another stream
+            log.debug("Encode HEADER_NEW");
 			headerType = HEADER_NEW;
 		} else if (header.getSize() != lastHeader.getSize() || header.getDataType() != lastHeader.getDataType()) {
 			// Same source header if last header data type or size differ
+            log.debug("Encode HEADER_SAME_SOURCE");
 			headerType = HEADER_SAME_SOURCE;
 		} else if (header.getTimer() != lastHeader.getTimer() + lastHeader.getTimerDelta()) {
 			// Timer change marker if there's time gap between header time stamps
+            log.debug("Encode HEADER_TIMER_CHANGE");
 			headerType = HEADER_TIMER_CHANGE;
 		} else {
 			// Continue encoding
+            log.debug("Encode HEADER_CONTINUE");
 			headerType = HEADER_CONTINUE;
 		}
 		return headerType;
@@ -471,9 +478,10 @@ public class RTMPProtocolEncoder implements Constants, IEventEncoder {
 		IServiceCall call = null;
 		switch (header.getDataType()) {
 			case TYPE_CHUNK_SIZE:
+                log.trace("Encode ChunkSize {}", message);
 				return encodeChunkSize((ChunkSize) message);
 			case TYPE_INVOKE:
-				log.trace("Invoke {}", message);
+				log.trace("Encode Invoke {}", message);
 				call = ((Invoke) message).getCall();
 				if (call != null) {
 					log.debug("{}", call.toString());
@@ -507,7 +515,7 @@ public class RTMPProtocolEncoder implements Constants, IEventEncoder {
 				}
 				return encodeInvoke((Invoke) message);
 			case TYPE_NOTIFY:
-				log.trace("Notify {}", message);
+				log.trace("Encode Notify {}", message);
 				call = ((Notify) message).getCall();
 				if (call == null) {
 					return encodeStreamMetadata((Notify) message);
@@ -516,16 +524,20 @@ public class RTMPProtocolEncoder implements Constants, IEventEncoder {
 				}
 			case TYPE_PING:
 				if (message instanceof SetBuffer) {
+                    log.trace("Encode SetBuffer {}", message);
 					return encodePing((SetBuffer) message);
 				} else if (message instanceof SWFResponse) {
+                    log.trace("Encode SWFResponse {}", message);
 					return encodePing((SWFResponse) message);
 				} else {
+                    log.trace("Encode Ping {}", message);
 					return encodePing((Ping) message);
 				}
 			case TYPE_BYTES_READ:
+                log.trace("Encode BytesRead {}", message);
 				return encodeBytesRead((BytesRead) message);
 			case TYPE_AGGREGATE:
-				log.trace("Encode aggregate message");
+				log.trace("Encode aggregate message {}", message);
 				return encodeAggregate((Aggregate) message);
 			case TYPE_AUDIO_DATA:
 				log.trace("Encode audio message");
@@ -534,16 +546,22 @@ public class RTMPProtocolEncoder implements Constants, IEventEncoder {
 				log.trace("Encode video message");
 				return encodeVideoData((VideoData) message);
 			case TYPE_FLEX_SHARED_OBJECT:
+                log.trace("Encode FlexSharedObject {}", message);
 				return encodeFlexSharedObject((ISharedObjectMessage) message);
 			case TYPE_SHARED_OBJECT:
+                log.trace("Encode SharedObject {}", message);
 				return encodeSharedObject((ISharedObjectMessage) message);
 			case TYPE_SERVER_BANDWIDTH:
+                log.trace("Encode ServerBandwith {}", message);
 				return encodeServerBW((ServerBW) message);
 			case TYPE_CLIENT_BANDWIDTH:
+                log.trace("Encode ClientBandwith {}", message);
 				return encodeClientBW((ClientBW) message);
 			case TYPE_FLEX_MESSAGE:
+                log.trace("Encode FlexMessage {}", message);
 				return encodeFlexMessage((FlexMessage) message);
 			case TYPE_FLEX_STREAM_SEND:
+                log.trace("Encode FlexStreamSend {}", message);
 				return encodeFlexStreamSend((FlexStreamSend) message);
 			default:
 				log.warn("Unknown object type: {}", header.getDataType());
@@ -752,17 +770,27 @@ public class RTMPProtocolEncoder implements Constants, IEventEncoder {
 		Output output = new org.red5.io.amf.Output(out);
 		final IServiceCall call = command.getCall();
 		final boolean isPending = (call.getStatus() == Call.STATUS_PENDING);
-		log.debug("Call: {} pending: {}", call, isPending);
+		log.debug("Encode command: {} pending: {}", call, isPending);
+
+        String action = "";
+
 		if (!isPending) {
-			log.debug("Call has been executed, send result");
-			Serializer.serialize(output, call.isSuccess() ? "_result" : "_error");
+            action = call.isSuccess() ? "_result" : "_error";
+			log.debug("   Write invoke result {}", action);
 		} else {
-			log.debug("This is a pending call, send request");
-			final String action = (call.getServiceName() == null) ? call.getServiceMethodName() : call.getServiceName() + '.' + call.getServiceMethodName();
-			Serializer.serialize(output, action); // seems right
+            action = (call.getServiceName() == null) ? call.getServiceMethodName() : call.getServiceName() + '.' + call.getServiceMethodName();
+			log.debug("   Write action {}", action);
 		}
-		if (command instanceof Invoke) {
-			Serializer.serialize(output, Integer.valueOf(command.getTransactionId()));
+
+        Serializer.serialize(output, action); // seems right
+
+        int transactId = 0;
+        if (command instanceof Invoke) {
+            transactId = Integer.valueOf(command.getTransactionId());
+            log.debug("   Write transactid {}", transactId);
+			Serializer.serialize(output, transactId);
+
+            log.debug("   Write conn params {}", command.getConnectionParams());
 			Serializer.serialize(output, command.getConnectionParams());
 		}
 		if (call.getServiceName() == null && "connect".equals(call.getServiceMethodName())) {
@@ -778,15 +806,15 @@ public class RTMPProtocolEncoder implements Constants, IEventEncoder {
 		if (!isPending && (command instanceof Invoke)) {
 			IPendingServiceCall pendingCall = (IPendingServiceCall) call;
 			if (!call.isSuccess()) {
-				log.debug("Call was not successful");
+				log.debug("   Call was not successful");
 				StatusObject status = generateErrorResult(StatusCodes.NC_CALL_FAILED, call.getException());
 				pendingCall.setResult(status);
 			}
 			Object res = pendingCall.getResult();
-			log.debug("Writing result: {}", res);
+			log.debug("   Writing call result: {}", res);
 			Serializer.serialize(output, res);
 		} else {
-			log.debug("Writing params");
+			log.debug("   Writing params");
 			final Object[] args = call.getArguments();
 			if (args != null) {
 				for (Object element : args) {
@@ -801,6 +829,7 @@ public class RTMPProtocolEncoder implements Constants, IEventEncoder {
 						}
 					} else {
 						// standard serialize
+                        log.debug("  param {}", element);
 						Serializer.serialize(output, element);
 					}
 				}
@@ -810,7 +839,9 @@ public class RTMPProtocolEncoder implements Constants, IEventEncoder {
 			out.setAutoExpand(true);
 			out.put(command.getData());
 		}
-	}
+
+        DebugDumper.dumpPacket("invoke_out_"+action+"_"+transactId, out);
+    }
 
 	/** {@inheritDoc} */
 	public IoBuffer encodePing(Ping ping) {
