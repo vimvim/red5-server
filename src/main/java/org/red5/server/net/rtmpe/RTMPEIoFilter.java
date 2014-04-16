@@ -145,9 +145,12 @@ public class RTMPEIoFilter extends IoFilterAdapter {
 	public void filterWrite(NextFilter nextFilter, IoSession session, WriteRequest request) throws Exception {
 
         String sessionId = (String) session.getAttribute(RTMPConnection.RTMP_SESSION_ID);
-        DebugDumper.dumpOutgoing(sessionId, (IoBuffer) request.getMessage());
 
-        log.trace("Outgoing message for session id: {} size:", sessionId, ((IoBuffer) request.getMessage()).limit());
+        if ((request instanceof WriteRequest) && ((((IoBuffer) request.getMessage()).limit()!=0))) {
+
+            int packetId = DebugDumper.dumpOutgoing(sessionId, (IoBuffer) request.getMessage());
+            log.trace("Outgoing message for session id: {} packet: {} size: {}", sessionId, packetId, ((IoBuffer) request.getMessage()).limit());
+        }
 
 		Cipher cipher = (Cipher) session.getAttribute(RTMPConnection.RTMPE_CIPHER_OUT);
 		if (cipher != null) { //may want to verify handshake is complete as well

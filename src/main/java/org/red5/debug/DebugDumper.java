@@ -21,14 +21,15 @@ public class DebugDumper {
     private static Map<String,Integer> inSeqNum = new HashMap<String,Integer>();
     private static Map<String,Integer> outSeqNum = new HashMap<String,Integer>();
 
+
     private static int videoStreamSqNum = 0;
 
-    public static synchronized void dumpIncoming(String sessionId, IoBuffer data) {
-        dumpPacket(sessionId, inSeqNum, "in", data);
+    public static synchronized int dumpIncoming(String sessionId, IoBuffer data) {
+        return dumpPacket(sessionId, inSeqNum, "in", data);
     }
 
-    public static synchronized void dumpOutgoing(String sessionId, IoBuffer data) {
-        dumpPacket(sessionId, outSeqNum, "out", data);
+    public static synchronized int dumpOutgoing(String sessionId, IoBuffer data) {
+        return dumpPacket(sessionId, outSeqNum, "out", data);
     }
 
     /**
@@ -145,9 +146,17 @@ public class DebugDumper {
     public static synchronized void dumpVideoStream(IoBuffer in) {
         dumpPacket("video_"+videoStreamSqNum+".bin", in);
         videoStreamSqNum = videoStreamSqNum + 1;
+    }    
+    
+    public static void dumpPacket(String filename, IoBuffer data) {
+
+        int arrayOffset = data.arrayOffset();
+        int limit = data.limit();
+
+        dumpData(filename, data.array(), arrayOffset, limit);
     }
 
-    private static void dumpPacket(String sessionId, Map<String,Integer> seqNums, String direction, IoBuffer data) {
+    private static int dumpPacket(String sessionId, Map<String,Integer> seqNums, String direction, IoBuffer data) {
 
         int seqNum = 0;
 
@@ -159,21 +168,8 @@ public class DebugDumper {
         seqNums.put(sessionId, seqNum);
 
         dumpPacket(direction+"_"+seqNum, data);
-    }
 
-    private static void dumpPacket(String filename, IoBuffer data) {
-
-        int length = data.limit()-data.position();
-        byte[] buffer = new byte[length];
-
-        int pos = data.position();
-        data.get(buffer);
-        data.position(pos);
-
-        // int arrayOffset = data.arrayOffset();
-        // int limit = data.limit();
-
-        dumpData(filename, buffer, 0, length);
+        return seqNum;
     }
 
     private static void dumpData(String filename, byte[] data, int offset, int limit) {

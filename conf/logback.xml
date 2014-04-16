@@ -37,7 +37,35 @@
   <logger name="ch.qos">
     <level value="WARN"/>
   </logger>
-  
+
+  <logger name="org.test.Application">
+     <level value="INFO"/>
+  </logger>
+
+  <logger name="org.red5.server.CoreHandler">
+      <level value="INFO"/>
+  </logger>
+
+  <logger name="org.red5.server.Client">
+      <level value="INFO"/>
+  </logger>
+
+  <logger name="org.red5.server.persistence.FilePersistence">
+    <level value="INFO"/>
+  </logger>
+
+  <logger name="org.red5.server.service.WarDeployer">
+     <level value="INFO"/>
+  </logger>
+
+  <logger name="org.red5.server.net.rtmp.BaseRTMPHandler">
+     <level value="INFO"/>
+  </logger>
+
+  <logger name="org.red5.server.net.rtmp.RTMPHandler">
+     <level value="INFO"/>
+  </logger>
+
   <logger name="org.red5.server.net.rtmpt.RTMPTConnection">
     <level value="TRACE"/>
   </logger>
@@ -119,7 +147,7 @@
   </logger>
 
   <logger name="org.red5.server.net.rtmp.codec.RTMPProtocolEncoder">
-      <level value="DEBUG"/>
+      <level value="TRACE"/>
   </logger>
 
   <logger name="org.red5.server.net.rtmp.codec.RTMPProtocolDecoder">

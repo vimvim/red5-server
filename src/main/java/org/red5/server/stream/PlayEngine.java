@@ -1024,6 +1024,7 @@ public final class PlayEngine implements IFilter, IPushableConsumer, IPipeConnec
 	 * send.
 	 */
 	private void sendClearPing() {
+        log.debug("Send STREAM_PLAYBUFFER_CLEAR");
 		Ping eof = new Ping();
 		eof.setEventType(Ping.STREAM_PLAYBUFFER_CLEAR);
 		eof.setValue2(streamId);
@@ -1037,6 +1038,7 @@ public final class PlayEngine implements IFilter, IPushableConsumer, IPipeConnec
 	 */
 	private void sendReset() {
 		if (pullMode) {
+            log.debug("Send PING RECORDED_STREAM");
 			Ping recorded = new Ping();
 			recorded.setEventType(Ping.RECORDED_STREAM);
 			recorded.setValue2(streamId);
@@ -1045,6 +1047,7 @@ public final class PlayEngine implements IFilter, IPushableConsumer, IPipeConnec
 			doPushMessage(recordedMsg);
 		}
 
+        log.debug("Send PING STREAM_BEGIN");
 		Ping begin = new Ping();
 		begin.setEventType(Ping.STREAM_BEGIN);
 		begin.setValue2(streamId);

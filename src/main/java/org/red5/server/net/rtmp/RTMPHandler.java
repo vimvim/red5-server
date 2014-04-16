@@ -360,6 +360,7 @@ public class RTMPHandler extends BaseRTMPHandler {
 											pc.setResult(result);
 										}
 										// Measure initial roundtrip time after connecting
+                                        log.debug("Send PING STREAM_BEGIN 0 -1 , Measure initial roundtrip time after connecting");
 										conn.ping(new Ping(Ping.STREAM_BEGIN, 0, -1));
 										disconnectOnReturn = false;
 									} else {
