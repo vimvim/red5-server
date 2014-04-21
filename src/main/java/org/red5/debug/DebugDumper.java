@@ -21,6 +21,9 @@ public class DebugDumper {
     private static Map<String,Integer> inSeqNum = new HashMap<String,Integer>();
     private static Map<String,Integer> outSeqNum = new HashMap<String,Integer>();
 
+
+    private static int videoStreamSqNum = 0;
+
     public static synchronized int dumpIncoming(String sessionId, IoBuffer data) {
         return dumpPacket(sessionId, inSeqNum, "in", data);
     }
@@ -135,6 +138,16 @@ public class DebugDumper {
         dumpPacket("packet_invoke_"+action+"_"+transactId, in);
     }
 
+    /**
+     * Dump video stream packet
+     *
+     * @param in
+     */
+    public static synchronized void dumpVideoStream(IoBuffer in) {
+        dumpPacket("video_"+videoStreamSqNum+".bin", in);
+        videoStreamSqNum = videoStreamSqNum + 1;
+    }    
+    
     public static void dumpPacket(String filename, IoBuffer data) {
 
         byte[] bytes = new byte[data.limit()];
