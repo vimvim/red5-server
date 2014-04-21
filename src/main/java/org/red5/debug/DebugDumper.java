@@ -137,10 +137,17 @@ public class DebugDumper {
 
     public static void dumpPacket(String filename, IoBuffer data) {
 
-        int arrayOffset = data.arrayOffset();
-        int limit = data.limit();
+        byte[] bytes = new byte[data.limit()];
+        int prevPos = data.position();
+        data.position(0);
+        data.get(bytes);
+        data.position(prevPos);
 
-        dumpData(filename, data.array(), arrayOffset, limit);
+        // int arrayOffset = data.arrayOffset();
+        // int limit = data.limit();
+
+        // dumpData(filename, data.array(), arrayOffset, limit);
+        dumpData(filename, bytes, 0, data.limit());
     }
 
     private static int dumpPacket(String sessionId, Map<String,Integer> seqNums, String direction, IoBuffer data) {
