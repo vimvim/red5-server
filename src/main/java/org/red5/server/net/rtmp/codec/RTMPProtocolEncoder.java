@@ -857,6 +857,9 @@ public class RTMPProtocolEncoder implements Constants, IEventEncoder {
 			default:
 				len = 6;
 		}
+
+        log.debug(" ENCODE PING TYPE:{}", type);
+
 		final IoBuffer out = IoBuffer.allocate(len);
 		out.putShort(type);
 		switch (type) {
@@ -869,6 +872,7 @@ public class RTMPProtocolEncoder implements Constants, IEventEncoder {
 			case Ping.BUFFER_EMPTY:
 			case Ping.BUFFER_FULL:
 				out.putInt(ping.getValue2());
+                log.debug("    SEND PING VALUE2:{}", ping.getValue2());
 				break;
 			case Ping.CLIENT_BUFFER:
 				if (ping instanceof SetBuffer) {
