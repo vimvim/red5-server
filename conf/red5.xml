@@ -36,6 +36,7 @@
 	
 	<!-- Now we can load the JEE container / servlet engine -->
   	<import resource="no-jee-container.xml"/>
+    <!-- <import resource="jee-container.xml"/> -->
 
     <!--
     <bean id="web.handler" class="org.test.Application"  />
