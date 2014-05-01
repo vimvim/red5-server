@@ -75,6 +75,9 @@ public class InMemoryPushPushPipe extends AbstractPipe {
 	 * @param message the message to be pushed to consumers.
 	 */
 	public void pushMessage(IMessage message) throws IOException {
+
+        log.trace("Send message to consumers: {}", message);
+
 		for (IConsumer consumer : consumers) {
 			try {
 				IPushableConsumer pcon = (IPushableConsumer) consumer;

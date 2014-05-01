@@ -148,8 +148,12 @@ public class RTMPEIoFilter extends IoFilterAdapter {
 
         if ((request instanceof WriteRequest) && ((((IoBuffer) request.getMessage()).limit()!=0))) {
 
+            if (((IoBuffer) request.getMessage()).limit()==2050) {
+                log.debug("Found it");
+            }
+
             int packetId = DebugDumper.dumpOutgoing(sessionId, (IoBuffer) request.getMessage());
-            log.trace("Outgoing message for session id: {} packet: {} size: {}", sessionId, packetId, ((IoBuffer) request.getMessage()).limit());
+            log.trace("Outgoing message for session id: {} packetId: {} size: {}", sessionId, packetId, ((IoBuffer) request.getMessage()).limit());
         }
 
 		Cipher cipher = (Cipher) session.getAttribute(RTMPConnection.RTMPE_CIPHER_OUT);

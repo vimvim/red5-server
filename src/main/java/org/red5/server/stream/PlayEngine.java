@@ -934,7 +934,7 @@ public final class PlayEngine implements IFilter, IPushableConsumer, IPipeConnec
 	 * @param message The message to send.
 	 */
 	private void doPushMessage(AbstractMessage message) {
-		log.trace("doPushMessage: {}", message.getMessageType());
+		log.debug("doPushMessage: {}", message.getMessageType());
 		if (msgOut != null) {
 			try {
 				msgOut.pushMessage(message);
@@ -969,11 +969,17 @@ public final class PlayEngine implements IFilter, IPushableConsumer, IPipeConnec
 				event.setTimestamp(messageIn.getBody().getTimestamp());
 				break;
 			case Constants.TYPE_AUDIO_DATA:
+
+                log.debug("Send audio data message");
+
 				dataReference = ((AudioData) messageIn.getBody()).getData();
 				event = new AudioData(dataReference);
 				event.setTimestamp(messageIn.getBody().getTimestamp());
 				break;
 			case Constants.TYPE_VIDEO_DATA:
+
+                log.debug("Send video data message");
+
 				dataReference = ((VideoData) messageIn.getBody()).getData();
 				event = new VideoData(dataReference);
 				event.setTimestamp(messageIn.getBody().getTimestamp());
@@ -1016,6 +1022,8 @@ public final class PlayEngine implements IFilter, IPushableConsumer, IPipeConnec
 				return;
 			}
 		}
+
+        log.debug("Do push message: {}", messageOut);
 		doPushMessage(messageOut);
 	}
 

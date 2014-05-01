@@ -40,6 +40,7 @@ import org.red5.server.jmx.mxbeans.RTMPMinaConnectionMXBean;
 import org.red5.server.net.rtmp.codec.RTMP;
 import org.red5.server.net.rtmp.event.ClientBW;
 import org.red5.server.net.rtmp.event.ServerBW;
+import org.red5.server.net.rtmp.event.VideoData;
 import org.red5.server.net.rtmp.message.Packet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -340,8 +341,18 @@ public class RTMPMinaConnection extends RTMPConnection implements RTMPMinaConnec
 				try {
 					acquired = lock.tryAcquire(10, TimeUnit.MILLISECONDS);
 					if (acquired) {
-						log.trace("Writing message");
+						log.debug("Writing message: {}", out);
 						writingMessage(out);
+
+                        if (out.getMessage() instanceof VideoData) {
+                            VideoData videoData = (VideoData) out.getMessage();
+                            if (videoData.getFrameType().name().equals("KEYFRAME")) {
+                                log.debug("Writing video keyframe: {}", videoData);
+                            } else {
+                                log.debug("Writing video frame: {}", videoData);
+                            }
+                        }
+
 						ioSession.write(out);
 						break;
 					}
