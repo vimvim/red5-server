@@ -162,6 +162,7 @@ public class RTMPProtocolEncoder implements Constants, IEventEncoder {
 					// we can do it with a single copy
 					BufferUtils.put(out, data, dataLen);
 				} else {
+                    log.trace("Encode message in several chunks:{}", numChunks);
 					int extendedTimestamp = header.getExtendedTimestamp();
 					for (int i = 0; i < numChunks - 1; i++) {
 						BufferUtils.put(out, data, chunkSize);
